@@ -82,6 +82,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>version.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)..\GitVersionInfo\x64\Release\BuildVersionInfo.exe /I:$(ProjectDir)version.ini /S || DEL  $(ProjectDir)versioninfo.rc2</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Remove older versioninfo.rc2</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -97,6 +103,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>version.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)..\GitVersionInfo\x64\Release\BuildVersionInfo.exe /I:$(ProjectDir)version.ini /S || DEL  $(ProjectDir)versioninfo.rc2</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Remove older versioninfo.rc2</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -110,6 +122,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>version.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)..\GitVersionInfo\x64\Release\BuildVersionInfo.exe /I:$(ProjectDir)version.ini /S || DEL  $(ProjectDir)versioninfo.rc2</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Remove older versioninfo.rc2</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -125,6 +143,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>version.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)..\GitVersionInfo\x64\Release\BuildVersionInfo.exe /I:$(ProjectDir)version.ini /S || DEL  $(ProjectDir)versioninfo.rc2</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Remove older versioninfo.rc2</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
@@ -152,7 +176,22 @@
     <Image Include="icon_c_64.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="version.ini" />
+    <None Include="build_rc2.bat" />
+    <CustomBuild Include="version.ini">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)build_rc2.bat $(SolutionDir)..\GitVersionInfo\x64\Release\BuildVersionInfo.exe $(TargetFileName) $(ProjectDir)version.ini $(ProjectDir)versioninfo.rc2 </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)versioninfo.rc2;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)build_rc2.bat $(SolutionDir)..\GitVersionInfo\x64\Release\BuildVersionInfo.exe $(TargetFileName) $(ProjectDir)version.ini $(ProjectDir)versioninfo.rc2 </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)versioninfo.rc2;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)build_rc2.bat $(SolutionDir)..\GitVersionInfo\x64\Release\BuildVersionInfo.exe $(TargetFileName) $(ProjectDir)version.ini $(ProjectDir)versioninfo.rc2 </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)versioninfo.rc2;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)build_rc2.bat $(SolutionDir)..\GitVersionInfo\x64\Release\BuildVersionInfo.exe $(TargetFileName) $(ProjectDir)version.ini $(ProjectDir)versioninfo.rc2 </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)versioninfo.rc2;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

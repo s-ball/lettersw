@@ -74,6 +74,11 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="version.ini" />
+    <None Include="build_rc2.bat">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="version.ini" />
   </ItemGroup>
 </Project>
