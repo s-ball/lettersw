@@ -13,6 +13,11 @@
 #define IDI_ICON1                       111
 #define IDS_GETMESSAGE                  111
 #define IDI_ICON2                       112
+#define IDS_VERSION                     112
+#define IDS_VERSION_DAT                 113
+#define IDS_VERSION_ERROR               114
+#define IDS_RSRC_STRING                 115
+#define IDC_VERSION                     1001
 #define ID_FILE_EXIT                    40001
 #define ID_HELP_ABOUT                   40002
 #define ID_EDIT                         40005
@@ -23,7 +28,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        113
 #define _APS_NEXT_COMMAND_VALUE         40006
-#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_CONTROL_VALUE         1002
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

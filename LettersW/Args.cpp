@@ -1,5 +1,6 @@
 #include "Args.h"
 #include "resource.h"
+#include "MessageBuilder.h"
 #include <stdlib.h>
 
 
@@ -7,7 +8,7 @@ UINT Args::parseInt(LPCWSTR arg) {
     LPWSTR end;
     UINT id = wcstoul(arg, &end, 10);
     if (*end != 0) {
-        throw ArgError(*this, IDS_WRONG_DEBUG, arg);
+        throw ArgError(hInst, IDS_WRONG_DEBUG, arg);
     }
     return id;
 }
@@ -49,24 +50,24 @@ Args::Args(LPCWSTR cmdLine, HINSTANCE hInst): hInst(hInst) {
     case 0:
         break;
     default:
-        throw ArgError(*this, IDS_TOO_MANY_ARGS);
+        throw ArgError(hInst, IDS_TOO_MANY_ARGS);
     }
 }
 
-DWORD ArgError::FormatMessage(UINT cause, HINSTANCE hInst, va_list& args)
-{
-    WCHAR tmp[SZ];
-
-    DWORD cr = LoadString(hInst, cause, tmp, SZ);
-    if (cr == 0) {
+ArgError::ArgError(HINSTANCE hInst, UINT cause, ...) : id(cause) {
+    va_list argList;
+    va_start(argList, cause);
+    MessageBuilder builder(hInst);
+    try {
+        builder.getStringMsgV(cause, msg, SZ, argList);
+    }
+    catch (MessageIdException& ex) {
 
     }
-    ::FormatMessage(FORMAT_MESSAGE_FROM_STRING, tmp, 0, 0,
-        msg, SZ, &args);
-    return cr;
+    va_end(argList);
 }
 
-LPWSTR ArgError::LoadLangString(UINT id, DWORD dwLang, HMODULE mod)
+LPWSTR ArgError::LoadLangString(UINT id, WORD dwLang, HMODULE mod)
 {
     UINT offset = id & 0x0F;
     UINT tableId = (id >> 4) + 1;
@@ -110,4 +111,11 @@ LPWSTR ArgError::LoadLangString(UINT id, DWORD dwLang, HMODULE mod)
     lstrcpyW(msg, buf);
     lstrcatW(msg, tmp);
     return msg;
+}
+
+LPWSTR ArgError::CopyString(LPCWSTR src)
+{
+    LPWSTR dest = new WCHAR(lstrlenW(src) + 1);
+    lstrcpyW(dest, src);
+    return dest;
 }
