@@ -2,6 +2,7 @@
 #include "resource.h"
 #include "Args.h"
 #include "MainWindow.h"
+#include "Preferences.h"
 
 
 int WINAPI wWinMain(
@@ -18,6 +19,9 @@ int WINAPI wWinMain(
         MessageBoxW(NULL, err.wcsWhat(), NULL, MB_OK | MB_ICONERROR);
         return 1;
     }
+    Preferences pref;
+
+    pref.load();
 
     MainWindow mainWindow(args, hInst);
     HWND hWnd = mainWindow.Create();
@@ -31,6 +35,10 @@ int WINAPI wWinMain(
         return 1;
     }
 
+    if (pref.getDims().ok) {
+        const MainWindow::Dims& dims = pref.getDims();
+        MoveWindow(hWnd, dims.x, dims.y, dims.w, dims.h, TRUE);
+    }
     ShowWindow(hWnd, nShowCmd);
 
     HACCEL hAccel = LoadAccelerators(hInst, MAKEINTRESOURCE(IDR_ACCELERATOR1));
@@ -55,6 +63,7 @@ int WINAPI wWinMain(
         DispatchMessage(&msg);
     }
     DestroyAcceleratorTable(hAccel);
-
+    pref.loadWnd(mainWindow);
+    pref.save();
     return (int) msg.wParam;
 }

@@ -18,6 +18,14 @@
 #define IDS_VERSION_ERROR               114
 #define IDS_RSRC_STRING                 115
 #define IDC_VERSION                     1001
+#define IDC_EDIT_LETTERS                1002
+#define IDC_CLEAR_LETTERS               1003
+#define IDC_VALID_LETTERS               1004
+#define IDC_EDIT_SEARCH                 1005
+#define IDC_CLEAR_SEARCH                1006
+#define IDC_VALID_SEARCH                1007
+#define IDC_GROUP_LETTERS               1008
+#define IDC_GROUP_SEARCH                1009
 #define ID_FILE_EXIT                    40001
 #define ID_HELP_ABOUT                   40002
 #define ID_EDIT                         40005
@@ -27,8 +35,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        113
-#define _APS_NEXT_COMMAND_VALUE         40006
-#define _APS_NEXT_CONTROL_VALUE         1002
+#define _APS_NEXT_COMMAND_VALUE         40008
+#define _APS_NEXT_CONTROL_VALUE         1010
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

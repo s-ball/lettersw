@@ -153,15 +153,19 @@
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="Args.cpp" />
+    <ClCompile Include="Control.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MessageBuilder.cpp" />
+    <ClCompile Include="Preferences.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="Args.h" />
+    <ClInclude Include="Control.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MessageBuilder.h" />
+    <ClInclude Include="Preferences.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
