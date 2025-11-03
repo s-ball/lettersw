@@ -97,10 +97,16 @@ INT_PTR MainWindow::OnSizing(WPARAM wp, LPARAM lp) {
 
 INT_PTR MainWindow::OnInitDialog(WPARAM, LPARAM) {
     RECT rect;
+    GetWindowRect(GetDlgItem(hWnd, IDC_TOPLEFT), &rect);
+    DWORD top = rect.top, left = rect.left;
     GetWindowRect(hWnd, &rect);
     height = minHeight = rect.bottom - rect.top;
     oldWidth = width = minWidth = rect.right - rect.left;
     GetClientRect(hWnd, &rect);
+    rect.top += top;
+    rect.bottom += top;
+    rect.left += left;
+    rect.right += left;
     for (auto child : children) {
         child->onInit(hWnd, &rect);
     }
