@@ -8,7 +8,7 @@
 
 void AboutDlg::Exec(HWND hWnd) {
     parent = hWnd;
-	DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_ABOUT), hWnd, StaticProc, (LPARAM) this);
+	DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_ABOUT), hWnd, (DLGPROC) StaticProc, (LPARAM) this);
 }
 
 LPCWSTR AboutDlg::getVersion()

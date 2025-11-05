@@ -19,3 +19,18 @@ public:
 	void onInit(HWND parent, LPRECT parentRect);
 };
 
+class Button : public Control {
+	DWORD clickId;
+	
+public:
+	using Click = void(LPVOID, DWORD);
+	void (* const onClick)(LPVOID, DWORD);
+	Button(UINT id, unsigned char sizing, unsigned char moving, Click onClick = nullptr, DWORD clickId = 0)
+		: Control(id, sizing, moving), onClick(onClick), clickId(clickId) {
+		if (nullptr == onClick) {
+			onClick = [](LPVOID, DWORD) {};
+		}
+	}
+	
+};
+

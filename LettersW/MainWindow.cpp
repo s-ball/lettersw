@@ -4,7 +4,7 @@
 
 HWND MainWindow::Create()
 {
-    hWnd = CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_MAIN), NULL, StaticProc, (LPARAM) this);
+    hWnd = CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_MAIN), NULL, (DLGPROC) StaticProc, (LPARAM) this);
 
     if (NULL != hWnd) {
         HICON hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1));
@@ -17,6 +17,39 @@ HWND MainWindow::Create()
         }
     }
     return hWnd;
+}
+
+void MainWindow::Valid(BOOL enable = TRUE) {
+    DWORD search[] = { IDC_CLEAR_SEARCH, IDC_VALID_SEARCH, IDC_EDIT_SEARCH };
+    HWND child = 0;
+    for (DWORD id : search) {
+        child = GetDlgItem(hWnd, id);
+        EnableWindow(child, enable);
+    }
+    if (enable) SetFocus(child);
+}
+
+void MainWindow::UpdateLetters() {
+    if (!inUpdateLetters) {
+        DWORD start, end;
+        SendDlgItemMessage(hWnd, IDC_EDIT_LETTERS, EM_GETSEL, (WPARAM)&start, (LPARAM)&end);
+        std::vector<WCHAR> text;
+        unsigned int sz = 32;
+        for (;;) {
+            text.resize(sz);
+            UINT cr = GetDlgItemTextW(hWnd, IDC_EDIT_LETTERS, text.data(), sz);
+            if (cr >= sz - 1) {
+                sz *= 2;
+            }
+            else break;
+        }
+        std::wstring str = dico.updateLetters(text.data(), start, end);
+        inUpdateLetters = true;
+        SetDlgItemTextW(hWnd, IDC_EDIT_LETTERS, str.c_str());
+        inUpdateLetters = false;
+        SendDlgItemMessage(hWnd, IDC_EDIT_LETTERS, EM_SETSEL, start, end);
+        Valid(FALSE);
+    }
 }
 
 INT_PTR MainWindow::StaticProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
@@ -41,6 +74,39 @@ INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         case ID_HELP_ABOUT:
             about.Exec(hWnd);
             return TRUE;
+        case ID_EDIT_COPY:
+            editCopy();
+            return TRUE;
+        case ID_EDIT_CUT:
+            editCut();
+            return TRUE;
+        case ID_EDIT_PASTE:
+            editPaste();
+            return TRUE;
+        case ID_EDIT_CLEARALL:
+            Clear(ctrlId);
+            return TRUE;
+        }
+        switch (HIWORD(wp)) {
+        case BN_CLICKED:
+            switch (LOWORD(wp)) {
+            case IDC_CLEAR_LETTERS:
+                Clear(IDC_EDIT_LETTERS);
+                return TRUE;
+            case IDC_VALID_LETTERS:
+                Valid(TRUE);
+                return TRUE;
+            }
+        case EN_UPDATE:
+            switch (LOWORD(wp)) {
+            case IDC_EDIT_LETTERS:
+                UpdateLetters();
+                break;
+            }
+        case BN_SETFOCUS:
+        case EN_SETFOCUS:
+            ctrlId = LOWORD(wp);
+            break;
         }
         break;
     case WM_CLOSE:
@@ -63,6 +129,11 @@ INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         break;
     case WM_WINDOWPOSCHANGED:
         return OnWindowPosChanged((WINDOWPOS*)lp);
+        break;
+    case WM_INITMENUPOPUP:
+        if (1 == LOWORD(lp)) { // Edit menu
+            initEditMenu((ctrlId == IDC_EDIT_LETTERS) || (ctrlId == IDC_EDIT_SEARCH));
+        }
         break;
     }
     return FALSE;
@@ -142,4 +213,78 @@ INT_PTR MainWindow::OnWindowPosChanged(WINDOWPOS* wp) {
     }
     oldWidth = wp->cx;
     return TRUE;
+}
+
+void MainWindow::initEditMenu(bool inEdit) {
+    HMENU menu = GetMenu(hWnd);
+    if (!inEdit) {
+        UINT items[] = { ID_EDIT_COPY, ID_EDIT_CUT, ID_EDIT_PASTE, ID_EDIT_CLEARALL };
+        for (auto item : items) {
+            EnableMenuItem(menu, item, MF_BYCOMMAND | MF_GRAYED);
+        }
+    }
+    else {
+        HWND child = GetDlgItem(hWnd, ctrlId);
+        WCHAR txt[8];
+        GetWindowTextW(child, txt, sizeof(txt) / sizeof(*txt));
+        EnableMenuItem(menu, ID_EDIT_CLEARALL,
+            (0 == txt[0]) ? MF_GRAYED : MF_ENABLED);
+        DWORD sel = (DWORD) SendMessage(child, EM_GETSEL, 0, 0);
+        EnableMenuItem(menu, ID_EDIT_COPY,
+            (LOWORD(sel) == HIWORD(sel)) ? MF_GRAYED : MF_ENABLED);
+        EnableMenuItem(menu, ID_EDIT_CUT,
+            (LOWORD(sel) == HIWORD(sel)) ? MF_GRAYED : MF_ENABLED);
+        EnableMenuItem(menu, ID_EDIT_PASTE,
+            IsClipboardFormatAvailable(CF_UNICODETEXT) ? MF_ENABLED : MF_GRAYED);
+    }
+}
+
+bool MainWindow::editCopy() {
+    DWORD start, end;
+    HWND child = GetDlgItem(hWnd, ctrlId);
+    DWORD sel = (DWORD)SendMessageW(child, EM_GETSEL, (WPARAM) & start, (WPARAM) & end);
+    if (start == end) return false;
+    if (start > end) std::swap(start, end);
+    std::vector<WCHAR> temp(1 + end);
+    GetWindowTextW(child, temp.data(), 1 + end);
+    temp[end] = 0;
+    HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * (1 + end - start));
+    if (hMem) {
+        LPWSTR ix = (LPWSTR)GlobalLock(hMem);
+        lstrcpyW(ix, temp.data() + start);
+        GlobalUnlock(hMem);
+
+        OpenClipboard(hWnd);
+        EmptyClipboard();
+        SetClipboardData(CF_UNICODETEXT, hMem);
+        CloseClipboard();
+        return true;
+    }
+    return false;
+}
+
+void MainWindow::editCut() {
+    if (editCopy()) {
+        SendDlgItemMessageW(hWnd, ctrlId, EM_REPLACESEL, TRUE, (LPARAM)L"");
+    }
+}
+
+void MainWindow::editPaste() {
+    OpenClipboard(hWnd);
+    HGLOBAL hMem = GetClipboardData(CF_UNICODETEXT);
+    if (hMem) {
+        HWND child = GetDlgItem(hWnd, ctrlId);
+        LPCWSTR ix = (LPCWSTR)GlobalLock(hMem);
+        int sz = (GlobalSize(hMem) + 1) / sizeof(WCHAR);
+        std::vector<WCHAR> temp(sz + 1);
+        lstrcpynW(temp.data(), ix, sz);
+        temp[sz] = 0;
+        GlobalUnlock(hMem);
+        SendMessageW(child, EM_REPLACESEL,
+            TRUE, (LPARAM) temp.data());
+        DWORD start, end;
+        SendMessage(child, EM_GETSEL, (WPARAM)&start, (LPARAM)&end);
+        if (end < start) std::swap(start, end);
+        SendMessage(child, EM_SETSEL, end, end);
+    }
 }

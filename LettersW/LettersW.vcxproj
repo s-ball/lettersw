@@ -154,6 +154,7 @@
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="Args.cpp" />
     <ClCompile Include="Control.cpp" />
+    <ClCompile Include="Dico.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MessageBuilder.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="Args.h" />
     <ClInclude Include="Control.h" />
+    <ClInclude Include="Dico.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MessageBuilder.h" />
     <ClInclude Include="Preferences.h" />
@@ -196,6 +198,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </CustomBuild>
+    <None Include="rcdata1.bin" />
+    <None Include="words.ascii" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,7 +1,8 @@
 #include "Args.h"
 #include "resource.h"
 #include "MessageBuilder.h"
-#include <stdlib.h>
+//#include <stdlib.h>
+#include <tchar.h>
 
 
 UINT Args::parseInt(LPCWSTR arg) {
@@ -61,8 +62,8 @@ ArgError::ArgError(HINSTANCE hInst, UINT cause, ...) : id(cause) {
     try {
         builder.getStringMsgV(cause, msg, SZ, argList);
     }
-    catch (MessageIdException& ex) {
-
+    catch (MessageIdException&) {
+        wsprintf(msg, _T("Resource not found for message id %d"), cause);
     }
     va_end(argList);
 }

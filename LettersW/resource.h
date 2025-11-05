@@ -15,6 +15,7 @@
 #define IDI_ICON2                       112
 #define IDS_VERSION                     112
 #define IDS_VERSION_DAT                 113
+#define IDR_WORDS                       113
 #define IDS_VERSION_ERROR               114
 #define IDS_RSRC_STRING                 115
 #define IDC_VERSION                     1001
@@ -30,13 +31,19 @@
 #define ID_FILE_EXIT                    40001
 #define ID_HELP_ABOUT                   40002
 #define ID_EDIT                         40005
+#define ID_EDIT40008                    40008
+#define ID_EDIT_UNDO                    40009
+#define ID_EDIT_COPY                    40010
+#define ID_EDIT_CUT                     40011
+#define ID_EDIT_PASTE                   40012
+#define ID_EDIT_CLEARALL                40013
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        113
-#define _APS_NEXT_COMMAND_VALUE         40008
+#define _APS_NEXT_RESOURCE_VALUE        114
+#define _APS_NEXT_COMMAND_VALUE         40014
 #define _APS_NEXT_CONTROL_VALUE         1011
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
