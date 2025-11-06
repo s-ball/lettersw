@@ -3,9 +3,10 @@
 
 class Control {
 	LONG x, width, y, height;
+	unsigned char sizing, moving;
+protected:
 	UINT id;
 	HWND hwnd;
-	unsigned char sizing, moving;
 
 public:
 	Control(UINT id, unsigned char sizing, unsigned char moving) {
@@ -19,18 +20,14 @@ public:
 	void onInit(HWND parent, LPRECT parentRect);
 };
 
-class Button : public Control {
-	DWORD clickId;
-	
+class Edit : public Control {
+	using Control::hwnd;
+	unsigned selStart = 0, selEnd = 0;
+
 public:
-	using Click = void(LPVOID, DWORD);
-	void (* const onClick)(LPVOID, DWORD);
-	Button(UINT id, unsigned char sizing, unsigned char moving, Click onClick = nullptr, DWORD clickId = 0)
-		: Control(id, sizing, moving), onClick(onClick), clickId(clickId) {
-		if (nullptr == onClick) {
-			onClick = [](LPVOID, DWORD) {};
-		}
-	}
-	
+	Edit(UINT id, unsigned char sizing, unsigned char moving) :
+		Control(id, sizing, moving) {}
+	void saveSel();
+	void restoreSel();
 };
 

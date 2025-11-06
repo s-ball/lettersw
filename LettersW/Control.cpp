@@ -17,3 +17,11 @@ void Control::onInit(HWND parent, LPRECT parentRect) {
 	width = rect.right - rect.left;
 	height = rect.bottom - rect.top;
 }
+
+void Edit::saveSel() {
+	SendMessage(hwnd, EM_GETSEL, (WPARAM)&selStart, (LPARAM)&selEnd);
+}
+
+void Edit::restoreSel() {
+	SendMessage(hwnd, EM_SETSEL, selStart, selEnd);
+}

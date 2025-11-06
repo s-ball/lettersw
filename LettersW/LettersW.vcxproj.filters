@@ -95,9 +95,6 @@
     <None Include="build_rc2.bat">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="rcdata1.bin">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="words.ascii" />
   </ItemGroup>
   <ItemGroup>

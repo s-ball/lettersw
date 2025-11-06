@@ -97,15 +97,35 @@ INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
                 Valid(TRUE);
                 return TRUE;
             }
+            break;
         case EN_UPDATE:
             switch (LOWORD(wp)) {
             case IDC_EDIT_LETTERS:
                 UpdateLetters();
                 break;
             }
-        case BN_SETFOCUS:
+            break;
         case EN_SETFOCUS:
+            switch (LOWORD(wp)) {
+            case IDC_EDIT_LETTERS:
+                lettersEdit.restoreSel();
+                break;
+            case IDC_EDIT_SEARCH:
+                searchEdit.restoreSel();
+                break;
+            }
+        case BN_SETFOCUS:
             ctrlId = LOWORD(wp);
+            break;
+        case EN_KILLFOCUS:
+            switch (LOWORD(wp)) {
+            case IDC_EDIT_LETTERS:
+                lettersEdit.saveSel();
+                break;
+            case IDC_EDIT_SEARCH:
+                searchEdit.saveSel();
+                break;
+            }
             break;
         }
         break;
@@ -275,7 +295,7 @@ void MainWindow::editPaste() {
     if (hMem) {
         HWND child = GetDlgItem(hWnd, ctrlId);
         LPCWSTR ix = (LPCWSTR)GlobalLock(hMem);
-        int sz = (GlobalSize(hMem) + 1) / sizeof(WCHAR);
+        int sz = (int) (GlobalSize(hMem) + 1) / sizeof(WCHAR);
         std::vector<WCHAR> temp(sz + 1);
         lstrcpynW(temp.data(), ix, sz);
         temp[sz] = 0;

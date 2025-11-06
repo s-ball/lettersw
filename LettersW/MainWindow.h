@@ -32,7 +32,7 @@ class MainWindow
 	void UpdateLetters();
 
 	Control lettersGroup = Control(IDC_GROUP_LETTERS, 255, 0 ), searchGroup = Control(IDC_GROUP_SEARCH, 255, 0);
-	Control lettersEdit{ IDC_EDIT_LETTERS, 255, 0 }, searchEdit{ IDC_EDIT_SEARCH, 255, 0 };
+	Edit lettersEdit{ IDC_EDIT_LETTERS, 255, 0 }, searchEdit{ IDC_EDIT_SEARCH, 255, 0 };
 	Control lettersClear{ IDC_CLEAR_LETTERS, 0, 255 },
 		searchClear{ IDC_CLEAR_SEARCH, 0,255 },
 		lettersValid{ IDC_VALID_LETTERS,0,255 }, searchValid{ IDC_VALID_SEARCH,0,255 };
@@ -43,6 +43,9 @@ class MainWindow
 	};
 
 	INT ctrlId = 0;
+
+	std::vector<WCHAR> letters;
+	std::vector<WCHAR> mask;
 
 	static INT_PTR StaticProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 	INT_PTR Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);

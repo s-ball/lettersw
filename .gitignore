@@ -3,6 +3,9 @@
 x64
 x86
 
+Debug/
+Release/
+
 !.gitignore
 
 # resource cache files
@@ -12,3 +15,4 @@ x86
 *~
 /LettersW/versioninfo.rc2
 /LettersW/version.bin
+
