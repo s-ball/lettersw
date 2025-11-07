@@ -80,7 +80,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>version.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;imagehlp.lib;icu.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>$(SolutionDir)..\GitVersionInfo\x64\Release\BuildVersionInfo.exe /I:$(ProjectDir)version.ini /S || DEL  $(ProjectDir)versioninfo.rc2</Command>
@@ -101,7 +101,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>version.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;imagehlp.lib;icu.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>$(SolutionDir)..\GitVersionInfo\x64\Release\BuildVersionInfo.exe /I:$(ProjectDir)version.ini /S || DEL  $(ProjectDir)versioninfo.rc2</Command>
@@ -120,7 +120,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>version.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;imagehlp.lib;icu.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>$(SolutionDir)..\GitVersionInfo\x64\Release\BuildVersionInfo.exe /I:$(ProjectDir)version.ini /S || DEL  $(ProjectDir)versioninfo.rc2</Command>
@@ -141,7 +141,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>version.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;imagehlp.lib;icu.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>$(SolutionDir)..\GitVersionInfo\x64\Release\BuildVersionInfo.exe /I:$(ProjectDir)version.ini /S || DEL  $(ProjectDir)versioninfo.rc2</Command>

@@ -29,7 +29,10 @@ class MainWindow
 	}
 
 	void Valid(BOOL enable);
-	void UpdateLetters();
+	void UpdateLetters(int id, bool letters);
+	void FilterSearch(std::vector<WCHAR>& str);
+	void Search();
+
 
 	Control lettersGroup = Control(IDC_GROUP_LETTERS, 255, 0 ), searchGroup = Control(IDC_GROUP_SEARCH, 255, 0);
 	Edit lettersEdit{ IDC_EDIT_LETTERS, 255, 0 }, searchEdit{ IDC_EDIT_SEARCH, 255, 0 };

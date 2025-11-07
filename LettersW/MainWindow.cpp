@@ -27,29 +27,95 @@ void MainWindow::Valid(BOOL enable = TRUE) {
         EnableWindow(child, enable);
     }
     if (enable) SetFocus(child);
+    SendMessage(hWnd, DM_SETDEFID, enable ? IDC_VALID_SEARCH : IDC_VALID_LETTERS, 0);
 }
 
-void MainWindow::UpdateLetters() {
+void MainWindow::UpdateLetters(int id = IDC_EDIT_LETTERS, bool letters = true) {
     if (!inUpdateLetters) {
         DWORD start, end;
-        SendDlgItemMessage(hWnd, IDC_EDIT_LETTERS, EM_GETSEL, (WPARAM)&start, (LPARAM)&end);
+        SendDlgItemMessage(hWnd, id, EM_GETSEL, (WPARAM)&start, (LPARAM)&end);
         std::vector<WCHAR> text;
         unsigned int sz = 32;
         for (;;) {
             text.resize(sz);
-            UINT cr = GetDlgItemTextW(hWnd, IDC_EDIT_LETTERS, text.data(), sz);
+            UINT cr = GetDlgItemTextW(hWnd, id, text.data(), sz);
             if (cr >= sz - 1) {
                 sz *= 2;
             }
             else break;
         }
-        std::wstring str = dico.updateLetters(text.data(), start, end);
+        std::vector<WCHAR> str = dico.updateLetters(text.data(), start, end, letters);
+        if (!letters) {
+            FilterSearch(str);
+        }
         inUpdateLetters = true;
-        SetDlgItemTextW(hWnd, IDC_EDIT_LETTERS, str.c_str());
+        SetDlgItemTextW(hWnd, id, str.data());
         inUpdateLetters = false;
-        SendDlgItemMessage(hWnd, IDC_EDIT_LETTERS, EM_SETSEL, start, end);
-        Valid(FALSE);
+        SendDlgItemMessage(hWnd, id, EM_SETSEL, start, end);
+        if (letters) Valid(FALSE);
     }
+}
+
+void MainWindow::FilterSearch(std::vector<WCHAR>& str) {
+    std::vector<WCHAR> text;
+    unsigned int sz = 32;
+    for (;;) {
+        text.resize(sz);
+        UINT cr = GetDlgItemTextW(hWnd, IDC_EDIT_LETTERS, text.data(), sz);
+        if (cr >= sz - 1) {
+            sz *= 2;
+        }
+        else break;
+    }
+    text.resize(1 + lstrlenW(text.data()));
+    auto dest = str.begin();
+    for (auto src = str.cbegin(); src != str.end(); ++src) {
+        if (0 == *src) {
+            *dest++ = 0;
+            break;
+        }
+        if ('*' == *src) {
+            str = std::vector<WCHAR>{ '*', 0 };
+            return;
+        }
+        if ('_' == *src) {
+            *dest++ = *src;
+            continue;
+        }
+        bool found = false;
+        for (WCHAR& letter : text) {
+            if (letter == *src) {
+                letter = 0;
+                found = true;
+                break;
+            }
+        }
+        if (found) *dest++ = *src;
+    }
+    str.resize(dest - str.begin());
+    if (str.size() > text.size()) {
+        str[text.size() - 1] = 0;
+    }
+}
+
+void MainWindow::Search() {
+    std::vector<std::vector<WCHAR>> wordlist;
+    std::vector<WCHAR> letters(32);
+    std::vector<WCHAR> mask(32);
+    for (;;) {
+        UINT cr = GetDlgItemTextW(hWnd, IDC_EDIT_LETTERS,
+            letters.data(), (int) letters.size());
+        if (cr >= letters.size() - 1) letters.resize(2 * letters.size());
+        else break;
+    }
+    for (;;) {
+        UINT cr = GetDlgItemTextW(hWnd, IDC_EDIT_SEARCH,
+            mask.data(), (int) mask.size());
+        if (cr >= mask.size() - 1) mask.resize(2 * mask.size());
+        else break;
+    }
+    wordlist = dico.findMatch(mask.data(), letters.data());
+    return;
 }
 
 INT_PTR MainWindow::StaticProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
@@ -96,12 +162,21 @@ INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
             case IDC_VALID_LETTERS:
                 Valid(TRUE);
                 return TRUE;
+            case IDC_CLEAR_SEARCH:
+                Clear(IDC_EDIT_SEARCH);
+                return TRUE;
+            case IDC_VALID_SEARCH:
+                Search();
+                return TRUE;
             }
             break;
         case EN_UPDATE:
             switch (LOWORD(wp)) {
             case IDC_EDIT_LETTERS:
-                UpdateLetters();
+                UpdateLetters(IDC_EDIT_LETTERS, true);
+                break;
+            case IDC_EDIT_SEARCH:
+                UpdateLetters(IDC_EDIT_SEARCH, false);
                 break;
             }
             break;
