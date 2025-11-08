@@ -2,11 +2,12 @@
 #include <Windows.h>
 
 class Control {
-	LONG x, width, y, height;
 	unsigned char sizing, moving;
 protected:
 	UINT id;
 	HWND hwnd;
+
+	LONG x, width, y, height;
 
 public:
 	Control(UINT id, unsigned char sizing, unsigned char moving) {
@@ -17,7 +18,7 @@ public:
 	virtual ~Control() = default;
 
 	void onSize(DWORD oldW, DWORD newW);
-	void onInit(HWND parent, LPRECT parentRect);
+	virtual void onInit(HWND parent, LPRECT parentRect);
 };
 
 class Edit : public Control {

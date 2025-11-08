@@ -217,10 +217,10 @@ INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         return OnSizing(wp, lp);
         break;
     case WM_SIZE:
-        return OnSize(wp, lp);
+        return FALSE; // OnSize(wp, lp);
         break;
     case WM_MOVE:
-        return OnMove(wp, lp);
+        return FALSE; // OnMove(wp, lp);
         break;
     case WM_WINDOWPOSCHANGED:
         return OnWindowPosChanged((WINDOWPOS*)lp);
@@ -266,8 +266,8 @@ INT_PTR MainWindow::OnInitDialog(WPARAM, LPARAM) {
     GetWindowRect(GetDlgItem(hWnd, IDC_TOPLEFT), &rect);
     DWORD top = rect.top, left = rect.left;
     GetWindowRect(hWnd, &rect);
-    height = minHeight = rect.bottom - rect.top;
-    oldWidth = width = minWidth = rect.right - rect.left;
+    dimHeight = height = minHeight = rect.bottom - rect.top;
+    dimWidth = width = minWidth = rect.right - rect.left;
     GetClientRect(hWnd, &rect);
     rect.top += top;
     rect.bottom += top;
@@ -280,14 +280,14 @@ INT_PTR MainWindow::OnInitDialog(WPARAM, LPARAM) {
 }
 
 INT_PTR MainWindow::OnSize(WPARAM wp, LPARAM lp) {
-    if (wp == SIZE_RESTORED) {
-        width = LOWORD(lp);
-        height = HIWORD(lp);
-    }
+    LONG w = LOWORD(lp);
+    LONG h = HIWORD(lp);
+    wd.onVSize(height, h);
     for (auto child : children) {
-        child->onSize(oldWidth, LOWORD(lp));
+        child->onSize(width, w);
     }
-    oldWidth = LOWORD(lp);
+    width = w;
+    height = h;
     return TRUE;
 }
 
@@ -299,14 +299,20 @@ INT_PTR MainWindow::OnMove(WPARAM, LPARAM lp)
 }
 
 INT_PTR MainWindow::OnWindowPosChanged(WINDOWPOS* wp) {
-    x = wp->x;
-    y = wp->y;
+    wd.onVSize(height, wp->cy);
+    for (auto child : children) {
+        child->onSize(width, wp->cx);
+    }
+
     width = wp->cx;
     height = wp->cy;
-    for (auto child : children) {
-        child->onSize(oldWidth, wp->cx);
+
+    if (!IsIconic(hWnd) && (!IsZoomed(hWnd))) {
+        x = wp->x;
+        y = wp->y;
+        dimHeight = height;
+        dimWidth = width;
     }
-    oldWidth = wp->cx;
     return TRUE;
 }
 

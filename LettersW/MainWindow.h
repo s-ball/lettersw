@@ -5,6 +5,7 @@
 #include "resource.h"
 #include "Control.h"
 #include "Dico.h"
+#include "WordDisplayer.h"
 #include <tchar.h>
 
 class MainWindow
@@ -19,7 +20,7 @@ class MainWindow
 	LONG minWidth, minHeight;
 	LONG x, y, width, height;
 
-	LONG oldWidth;
+	LONG dimWidth, dimHeight;
 
 	bool inUpdateLetters = false;
 
@@ -39,12 +40,14 @@ class MainWindow
 	Control lettersClear{ IDC_CLEAR_LETTERS, 0, 255 },
 		searchClear{ IDC_CLEAR_SEARCH, 0,255 },
 		lettersValid{ IDC_VALID_LETTERS,0,255 }, searchValid{ IDC_VALID_SEARCH,0,255 };
+	WordDisplayer wd{ IDC_WORDS, 255, 0 };
 
-	Control* children[8] = {
+	Control* children[9] = {
 		&lettersGroup, &lettersEdit, &lettersClear, &lettersValid,
-		&searchGroup, &searchEdit, &searchClear, &searchValid
+		&searchGroup, &searchEdit, &searchClear, &searchValid, &wd
 	};
 
+	
 	INT ctrlId = 0;
 
 	std::vector<WCHAR> letters;
@@ -73,7 +76,7 @@ public:
 
 	HWND Create();
 	Dims getDims() const {
-		return Dims{ x, y, width, height };
+		return Dims{ x, y, dimWidth, dimHeight };
 	}
 };
 

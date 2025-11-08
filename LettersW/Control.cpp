@@ -1,7 +1,7 @@
 #include "Control.h"
 
 void Control::onSize(DWORD oldW, DWORD newW) {
-	if (oldW == newW) return;
+	// if (oldW == newW) return;
 	int delta = newW - oldW;
 	x += delta * moving / 255;
 	width += delta * sizing / 255;
