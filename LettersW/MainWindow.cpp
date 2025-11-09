@@ -115,6 +115,8 @@ void MainWindow::Search() {
         else break;
     }
     wordlist = dico.findMatch(mask.data(), letters.data());
+    wd.display1(std::move(wordlist)
+);
     return;
 }
 
