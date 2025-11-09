@@ -115,8 +115,7 @@ void MainWindow::Search() {
         else break;
     }
     wordlist = dico.findMatch(mask.data(), letters.data());
-    wd.display1(std::move(wordlist)
-);
+    wd.display1(std::move(wordlist));
     return;
 }
 
@@ -129,7 +128,7 @@ INT_PTR MainWindow::StaticProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
     else {
         wnd = (MainWindow*)GetWindowLongPtr(hWnd, DWLP_USER);
     }
-    return wnd->Proc(hWnd, msg, wp, lp);
+    return wnd ? wnd->Proc(hWnd, msg, wp, lp) : FALSE;
 }
 
 INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
@@ -218,12 +217,6 @@ INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
     case WM_SIZING:
         return OnSizing(wp, lp);
         break;
-    case WM_SIZE:
-        return FALSE; // OnSize(wp, lp);
-        break;
-    case WM_MOVE:
-        return FALSE; // OnMove(wp, lp);
-        break;
     case WM_WINDOWPOSCHANGED:
         return OnWindowPosChanged((WINDOWPOS*)lp);
         break;
@@ -281,24 +274,6 @@ INT_PTR MainWindow::OnInitDialog(WPARAM, LPARAM) {
     return TRUE;
 }
 
-INT_PTR MainWindow::OnSize(WPARAM wp, LPARAM lp) {
-    LONG w = LOWORD(lp);
-    LONG h = HIWORD(lp);
-    wd.onVSize(height, h);
-    for (auto child : children) {
-        child->onSize(width, w);
-    }
-    width = w;
-    height = h;
-    return TRUE;
-}
-
-INT_PTR MainWindow::OnMove(WPARAM, LPARAM lp)
-{
-    x = LOWORD(lp);
-    y = HIWORD(lp);
-    return TRUE;
-}
 
 INT_PTR MainWindow::OnWindowPosChanged(WINDOWPOS* wp) {
     wd.onVSize(height, wp->cy);

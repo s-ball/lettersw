@@ -58,8 +58,6 @@ class MainWindow
 
 	INT_PTR OnSizing(WPARAM, LPARAM);
 	INT_PTR OnInitDialog(WPARAM, LPARAM);
-	INT_PTR OnSize(WPARAM, LPARAM);
-	INT_PTR OnMove(WPARAM, LPARAM);
 	INT_PTR OnWindowPosChanged(WINDOWPOS* wp);
 
 	void initEditMenu(bool inEdit);
