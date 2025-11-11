@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "resource.h"
+#include <algorithm>
 
 
 HWND MainWindow::Create()
@@ -114,8 +115,19 @@ void MainWindow::Search() {
         if (cr >= mask.size() - 1) mask.resize(2 * mask.size());
         else break;
     }
-    wordlist = dico.findMatch(mask.data(), letters.data());
-    wd.display1(std::move(wordlist));
+    if (std::find(mask.begin(), mask.end(), '*') != mask.end()) {
+        if (mask[1] != 0) {
+            SetDlgItemTextW(hWnd, IDC_EDIT_SEARCH, L"*");
+        }
+        else {
+            auto list = dico.findAll(letters.data());
+            wd.displayN(std::move(list));
+        }
+    }
+    else {
+        wordlist = dico.findMatch(mask.data(), letters.data());
+        wd.display1(std::move(wordlist));
+    }
     return;
 }
 
@@ -129,6 +141,24 @@ INT_PTR MainWindow::StaticProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         wnd = (MainWindow*)GetWindowLongPtr(hWnd, DWLP_USER);
     }
     return wnd ? wnd->Proc(hWnd, msg, wp, lp) : FALSE;
+}
+
+void MainWindow::setScrollbar(bool set) {
+    LONG_PTR style = GetWindowLongPtr(hWnd, GWL_STYLE);
+    if (set) style |= WS_VSCROLL;
+    else style &= ~WS_VSCROLL;
+    RECT rect;
+    GetClientRect(hWnd, &rect);
+    UINT old = rect.right;
+    SetWindowLongPtrW(hWnd, GWL_STYLE, style);
+    SetWindowPos(hWnd, 0, 0, 0, 0, 0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+    GetClientRect(hWnd, &rect);
+    UINT w = rect.right;
+    wd.onVSize(0, 0, yScroll);
+    for (auto child : children) {
+        child->onSize(old, w, yScroll);
+    }
 }
 
 INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
@@ -276,9 +306,9 @@ INT_PTR MainWindow::OnInitDialog(WPARAM, LPARAM) {
 
 
 INT_PTR MainWindow::OnWindowPosChanged(WINDOWPOS* wp) {
-    wd.onVSize(height, wp->cy);
+    wd.onVSize(height, wp->cy, yScroll);
     for (auto child : children) {
-        child->onSize(width, wp->cx);
+        child->onSize(width, wp->cx, yScroll);
     }
 
     width = wp->cx;
@@ -345,6 +375,8 @@ void MainWindow::editCut() {
     if (editCopy()) {
         SendDlgItemMessageW(hWnd, ctrlId, EM_REPLACESEL, TRUE, (LPARAM)L"");
     }
+    yScroll = 40;
+    setScrollbar(true);
 }
 
 void MainWindow::editPaste() {
@@ -365,4 +397,6 @@ void MainWindow::editPaste() {
         if (end < start) std::swap(start, end);
         SendMessage(child, EM_SETSEL, end, end);
     }
+    yScroll = 0;
+    setScrollbar(false);
 }

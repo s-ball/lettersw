@@ -17,7 +17,7 @@ public:
 	}
 	virtual ~Control() = default;
 
-	void onSize(DWORD oldW, DWORD newW);
+	void onSize(DWORD oldW, DWORD newW, DWORD yScroll);
 	virtual void onInit(HWND parent, LPRECT parentRect);
 };
 
@@ -30,5 +30,8 @@ public:
 		Control(id, sizing, moving) {}
 	void saveSel();
 	void restoreSel();
+	LONG yPos() {
+		return y;
+	}
 };
 

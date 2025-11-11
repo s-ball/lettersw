@@ -52,13 +52,14 @@ void WordDisplayer::paint(HDC hDC)
     GetTextFaceW(hDC, sizeof(fontName) / sizeof(*fontName), fontName);
 
     int deltaH = addHeight;
-    int y = 0;
+    int y = 0, x = 0;
     for (const auto& words : wordlist) {
         if (!words.empty()) {
             int len = words[0].size();
             int deltaW = singleWidth + (len -1) * addWidth + spaceWidth;
             int count = (width + spaceWidth) / (deltaW + spaceWidth);
-            int j = 0, x = 0;
+            int j = 0;
+            x = 0;
             for (const auto& word : words) {
                 TextOut(hDC, x, y, word.data(), word.size());
                 if (++j == count) {
@@ -69,7 +70,8 @@ void WordDisplayer::paint(HDC hDC)
                 else x += deltaW;
             }
         }
-        y += deltaH * 3 / 2;
+        if (x == 0) y += deltaH / 2;
+        else y += deltaH * 3 / 2;
     }
     SelectObject(hDC, old);
 }
@@ -89,6 +91,7 @@ WordDisplayer::WordDisplayer(UINT id, unsigned char sizing, unsigned char moving
 
 void WordDisplayer::onInit(HWND parent, LPRECT parentRect) {
     Control::onInit(parent, parentRect);
+    hNoScroll = height;
     hwnd = GetDlgItem(parent, id);
     SetWindowLongPtr(hwnd, 0, (LONG_PTR)this);
 
@@ -113,8 +116,8 @@ void WordDisplayer::onInit(HWND parent, LPRECT parentRect) {
 
 }
 
-void WordDisplayer::onVSize(DWORD oldH, DWORD newH) {
-    if (oldH == newH) return;
+void WordDisplayer::onVSize(DWORD oldH, DWORD newH, DWORD yScroll) {
     int delta = newH - oldH;
-    height += delta;
+    hNoScroll += delta;
+    height = hNoScroll + yScroll;
 }

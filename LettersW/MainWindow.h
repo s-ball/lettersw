@@ -20,6 +20,8 @@ class MainWindow
 	LONG minWidth, minHeight;
 	LONG x, y, width, height;
 
+	LONG yScroll;
+
 	LONG dimWidth, dimHeight;
 
 	bool inUpdateLetters = false;
@@ -64,6 +66,8 @@ class MainWindow
 	bool editCopy();
 	void editCut();
 	void editPaste();
+
+	void setScrollbar(bool set);
 
 
 public:

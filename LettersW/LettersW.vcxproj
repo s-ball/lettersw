@@ -159,6 +159,7 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MessageBuilder.cpp" />
     <ClCompile Include="Preferences.cpp" />
+    <ClCompile Include="Scroller.cpp" />
     <ClCompile Include="WordDisplayer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +171,7 @@
     <ClInclude Include="MessageBuilder.h" />
     <ClInclude Include="Preferences.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Scroller.h" />
     <ClInclude Include="WordDisplayer.h" />
   </ItemGroup>
   <ItemGroup>

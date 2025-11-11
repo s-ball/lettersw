@@ -82,6 +82,20 @@ std::vector<std::vector<WCHAR>> Dico::findMatch(LPCWSTR mask, LPCWSTR letters) {
 	return ret;
 }
 
+std::vector<std::vector<std::vector<WCHAR>>> Dico::findAll(LPCWSTR letters)
+{
+	unsigned len = lstrlenW(letters) + 1;
+	std::vector<std::vector<std::vector<WCHAR>>> cr;
+	std::vector<WCHAR> mask(len, L'\0');
+	mask[0] = mask[1] = '_';
+	for (unsigned i = 2; i < len; i++) {
+		mask[i] = '_';
+		auto temp = findMatch(mask.data(), letters);
+		if (!temp.empty()) cr.push_back(std::move(temp));
+	}
+	return cr;
+}
+
 std::vector<WCHAR> Dico::updateLetters(LPCWSTR text, DWORD& start, DWORD& end, bool letters = true)
 {
 	int32_t sz = lstrlenW(text);

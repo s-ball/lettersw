@@ -13,6 +13,8 @@ class WordDisplayer: public Control
 	HFONT hFont;
 	bool hFontDel = false;
 
+	LONG hNoScroll;
+
 	ATOM registerClass();
 	void unregister();
 
@@ -34,7 +36,7 @@ public:
 		if (hFontDel) DeleteObject(hFont);
 	}
 	void onInit(HWND parent, LPRECT parentRect);
-	void onVSize(DWORD oldH, DWORD newH);
+	void onVSize(DWORD oldH, DWORD newH, DWORD yScroll);
 	void display1(std::vector < std::vector<WCHAR>>&& words) {
 		wordlist = std::vector<std::vector<std::vector<WCHAR>>>{ words };
 		InvalidateRect(hwnd, NULL, TRUE);

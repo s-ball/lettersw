@@ -27,6 +27,7 @@ public:
 
 	bool match(LPCSTR word, LPCWSTR mask, LPCWSTR letters);
 	std::vector<std::vector<WCHAR>> findMatch(LPCWSTR mask, LPCWSTR letters);
+	std::vector<std::vector<std::vector<WCHAR>>> findAll(LPCWSTR letters);
 
 	std::vector<WCHAR> updateLetters(LPCWSTR text, DWORD& start, DWORD& end, bool letters);
 

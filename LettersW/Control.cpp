@@ -1,11 +1,11 @@
 #include "Control.h"
 
-void Control::onSize(DWORD oldW, DWORD newW) {
+void Control::onSize(DWORD oldW, DWORD newW, DWORD yScroll) {
 	// if (oldW == newW) return;
 	int delta = newW - oldW;
 	x += delta * moving / 255;
 	width += delta * sizing / 255;
-	MoveWindow(hwnd, x, y, width, height, TRUE);
+	MoveWindow(hwnd, x, y - yScroll, width, height, TRUE);
 }
 
 void Control::onInit(HWND parent, LPRECT parentRect) {
