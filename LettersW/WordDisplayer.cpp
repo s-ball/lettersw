@@ -1,4 +1,5 @@
 #include "WordDisplayer.h"
+#include <crtdbg.h>
 
 ATOM WordDisplayer::registerClass()
 {
@@ -48,20 +49,19 @@ LRESULT WordDisplayer::Proc(UINT msg, WPARAM wp, LPARAM lp)
 void WordDisplayer::paint(HDC hDC)
 {
     LPVOID old = SelectObject(hDC, hFont);
-    WCHAR fontName[256];
-    GetTextFaceW(hDC, sizeof(fontName) / sizeof(*fontName), fontName);
 
     int deltaH = addHeight;
     int y = 0, x = 0;
     for (const auto& words : wordlist) {
         if (!words.empty()) {
-            int len = words[0].size();
+            int len = (int) words[0].size();
             int deltaW = singleWidth + (len -1) * addWidth + spaceWidth;
-            int count = (width + spaceWidth) / (deltaW + spaceWidth);
+            int count = (width + spaceWidth) / deltaW;
+            if (count == 0) count = 1;
             int j = 0;
             x = 0;
             for (const auto& word : words) {
-                TextOut(hDC, x, y, word.data(), word.size());
+                TextOut(hDC, x, y, word.data(), (int) word.size());
                 if (++j == count) {
                     j = 0;
                     x = 0;
@@ -73,6 +73,7 @@ void WordDisplayer::paint(HDC hDC)
         if (x == 0) y += deltaH / 2;
         else y += deltaH * 3 / 2;
     }
+    _RPT1(_CRT_WARN, "required height: %d\n", y + singleHeight);
     SelectObject(hDC, old);
 }
 
@@ -116,8 +117,28 @@ void WordDisplayer::onInit(HWND parent, LPRECT parentRect) {
 
 }
 
-void WordDisplayer::onVSize(DWORD oldH, DWORD newH, DWORD yScroll) {
+int WordDisplayer::onVSize(DWORD oldH, DWORD newH, DWORD yScroll) {
     int delta = newH - oldH;
+    if (delta != 0) _RPT2(_CRT_WARN, "height: %d -> %d\n", oldH, newH);
     hNoScroll += delta;
     height = hNoScroll + yScroll;
+
+
+    int total = -height;
+    for (const auto& words : wordlist) {
+        if (!words.empty()) {
+            int len = (int) words[0].size();
+            int deltaW = singleWidth + (len - 1) * addWidth + spaceWidth;
+            int count = (width + spaceWidth) / deltaW;
+            if (count == 0) count = 1;
+            int addLines = ((int) words.size() - 1) / count;
+            total += singleHeight + addLines * addHeight;
+        }
+    }
+    if (!wordlist.empty()) {
+        total += (addHeight / 2) * (wordlist.size() - 1);
+    }
+    MoveWindow(hwnd, x, y - yScroll, width, height, TRUE);
+    _RPT1(_CRT_WARN, "vSize: %d\n", total + height);
+    return (total > 0) ? total : 0;
 }

@@ -128,6 +128,7 @@ void MainWindow::Search() {
         wordlist = dico.findMatch(mask.data(), letters.data());
         wd.display1(std::move(wordlist));
     }
+    PostMessage(hWnd, APPM_REDRAW, 0, 0);
     return;
 }
 
@@ -143,22 +144,20 @@ INT_PTR MainWindow::StaticProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
     return wnd ? wnd->Proc(hWnd, msg, wp, lp) : FALSE;
 }
 
-void MainWindow::setScrollbar(bool set) {
-    LONG_PTR style = GetWindowLongPtr(hWnd, GWL_STYLE);
-    if (set) style |= WS_VSCROLL;
-    else style &= ~WS_VSCROLL;
+void MainWindow::redraw() {
     RECT rect;
     GetClientRect(hWnd, &rect);
-    UINT old = rect.right;
-    SetWindowLongPtrW(hWnd, GWL_STYLE, style);
-    SetWindowPos(hWnd, 0, 0, 0, 0, 0,
-        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED | SWP_SHOWWINDOW);
-    GetClientRect(hWnd, &rect);
-    UINT w = rect.right;
-    wd.onVSize(0, 0, yScroll);
     for (auto child : children) {
-        child->onSize(old, w, yScroll);
+        child->onSize(width, rect.right, yScroll);
     }
+    int missing = wd.onVSize(height, rect.bottom, yScroll);
+    scroller.setMaxPos(yScroll + missing);
+    width = rect.right;
+    height = rect.bottom;
+}
+
+void MainWindow::adjustScroll(int scroll) {
+    InvalidateRect(hWnd, NULL, TRUE);
 }
 
 INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
@@ -255,6 +254,17 @@ INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
             initEditMenu((ctrlId == IDC_EDIT_LETTERS) || (ctrlId == IDC_EDIT_SEARCH));
         }
         break;
+    case WM_VSCROLL:
+        scroller.scrollMsg(wp);
+        break;
+    case APPM_SCROLL:
+        yScroll = wp;
+        redraw();
+        InvalidateRect(hWnd, NULL, TRUE);
+        break;
+    case APPM_REDRAW:
+        OnRedraw();
+        break;
     }
     return FALSE;
 }
@@ -291,9 +301,11 @@ INT_PTR MainWindow::OnInitDialog(WPARAM, LPARAM) {
     GetWindowRect(GetDlgItem(hWnd, IDC_TOPLEFT), &rect);
     DWORD top = rect.top, left = rect.left;
     GetWindowRect(hWnd, &rect);
-    dimHeight = height = minHeight = rect.bottom - rect.top;
-    dimWidth = width = minWidth = rect.right - rect.left;
+    dimHeight = minHeight = rect.bottom - rect.top;
+    dimWidth = minWidth = rect.right - rect.left;
     GetClientRect(hWnd, &rect);
+    height = rect.bottom - rect.top;
+    width = rect.right - rect.top;
     rect.top += top;
     rect.bottom += top;
     rect.left += left;
@@ -306,20 +318,24 @@ INT_PTR MainWindow::OnInitDialog(WPARAM, LPARAM) {
 
 
 INT_PTR MainWindow::OnWindowPosChanged(WINDOWPOS* wp) {
-    wd.onVSize(height, wp->cy, yScroll);
-    for (auto child : children) {
-        child->onSize(width, wp->cx, yScroll);
-    }
-
-    width = wp->cx;
-    height = wp->cy;
-
+    redraw();
     if (!IsIconic(hWnd) && (!IsZoomed(hWnd))) {
         x = wp->x;
         y = wp->y;
-        dimHeight = height;
-        dimWidth = width;
+        dimHeight = wp->cy;
+        dimWidth = wp->cx;
     }
+    return TRUE;
+}
+
+INT_PTR MainWindow::OnRedraw()
+{
+    RECT rect;
+    GetWindowRect(hWnd, &rect);
+    MoveWindow(hWnd, rect.left, rect.top, rect.right - rect.left + 1,
+        rect.bottom - rect.top, FALSE);
+    MoveWindow(hWnd, rect.left, rect.top, rect.right - rect.left,
+        rect.bottom - rect.top, TRUE);
     return TRUE;
 }
 
@@ -375,8 +391,6 @@ void MainWindow::editCut() {
     if (editCopy()) {
         SendDlgItemMessageW(hWnd, ctrlId, EM_REPLACESEL, TRUE, (LPARAM)L"");
     }
-    yScroll = 40;
-    setScrollbar(true);
 }
 
 void MainWindow::editPaste() {
@@ -397,6 +411,4 @@ void MainWindow::editPaste() {
         if (end < start) std::swap(start, end);
         SendMessage(child, EM_SETSEL, end, end);
     }
-    yScroll = 0;
-    setScrollbar(false);
 }

@@ -12,10 +12,10 @@ void Control::onInit(HWND parent, LPRECT parentRect) {
 	hwnd = GetDlgItem(parent, id);
 	RECT rect;
 	GetWindowRect(hwnd, &rect);
-	x = rect.left - parentRect->left;
-	y = rect.top - parentRect->top;
 	width = rect.right - rect.left;
 	height = rect.bottom - rect.top;
+	x = rect.left - parentRect->left;
+	y = rect.top - parentRect->top;
 }
 
 void Edit::saveSel() {

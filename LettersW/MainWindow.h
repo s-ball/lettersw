@@ -6,10 +6,13 @@
 #include "Control.h"
 #include "Dico.h"
 #include "WordDisplayer.h"
+#include "Scroller.h"
 #include <tchar.h>
 
-class MainWindow
+class MainWindow: public ScrollOwner
 {
+	static const int APPM_REDRAW = WM_APP + 2;
+
 	Args& args;
 	HINSTANCE hInst;
 	HWND hWnd = NULL;
@@ -61,20 +64,34 @@ class MainWindow
 	INT_PTR OnSizing(WPARAM, LPARAM);
 	INT_PTR OnInitDialog(WPARAM, LPARAM);
 	INT_PTR OnWindowPosChanged(WINDOWPOS* wp);
+	INT_PTR OnRedraw();
 
 	void initEditMenu(bool inEdit);
 	bool editCopy();
 	void editCut();
 	void editPaste();
 
-	void setScrollbar(bool set);
+	Scroller scroller;
+	void redraw();
+	void adjustScroll(int scroll);
+
+	HWND getHwnd() const {
+		return hWnd;
+	}
+	int lineSize() const {
+		return 10;
+	}
+	int pageSize() const {
+		return 40;
+	}
 
 
 public:
 	struct Dims {
 		LONG x, y, w, h;
 	};
-	MainWindow(Args& args, HINSTANCE hInst) : args(args), hInst(hInst), about(args, hInst), dico(hInst) {}
+	MainWindow(Args& args, HINSTANCE hInst) : args(args), hInst(hInst),
+		about(args, hInst), dico(hInst), scroller(*this) {}
 
 	HWND Create();
 	Dims getDims() const {
