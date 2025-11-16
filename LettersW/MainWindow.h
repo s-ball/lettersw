@@ -79,10 +79,20 @@ class MainWindow: public ScrollOwner
 		return hWnd;
 	}
 	int lineSize() const {
-		return 10;
+		static int line = 0;
+
+		if (line == 0) {
+			line = wd.line();
+			if (line == 0) return 10;
+		}
+		return line;
 	}
 	int pageSize() const {
-		return 40;
+		int page = height / 3;
+		if (page < 4 * lineSize()) {
+			page = 4 * lineSize();
+		}
+		return page;
 	}
 
 

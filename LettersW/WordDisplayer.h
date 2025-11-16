@@ -45,5 +45,8 @@ public:
 		wordlist = list;
 		InvalidateRect(hwnd, NULL, TRUE);
 	}
+	int line() const {
+		return addHeight;
+	}
 };
 
