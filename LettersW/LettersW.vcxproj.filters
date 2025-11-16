@@ -108,6 +108,7 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="words.ascii" />
+    <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="version.ini" />

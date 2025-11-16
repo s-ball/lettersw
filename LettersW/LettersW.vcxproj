@@ -186,6 +186,7 @@
     <Image Include="icon_c_64.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\README.md" />
     <None Include="build_rc2.bat" />
     <CustomBuild Include="version.ini">
       <FileType>Document</FileType>
