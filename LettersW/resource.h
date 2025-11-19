@@ -28,7 +28,6 @@
 #define IDC_GROUP_LETTERS               1008
 #define IDC_GROUP_SEARCH                1009
 #define IDC_TOPLEFT                     1010
-#define IDC_CUSTOM1                     1011
 #define IDC_WORDS                       1011
 #define ID_FILE_EXIT                    40001
 #define ID_HELP_ABOUT                   40002
@@ -39,13 +38,15 @@
 #define ID_EDIT_CUT                     40011
 #define ID_EDIT_PASTE                   40012
 #define ID_EDIT_CLEARALL                40013
+#define ID_SCROLL_AVAIL                 40014
+#define ID_SCROLL_MASK                  40015
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        114
-#define _APS_NEXT_COMMAND_VALUE         40014
+#define _APS_NEXT_COMMAND_VALUE         40016
 #define _APS_NEXT_CONTROL_VALUE         1012
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

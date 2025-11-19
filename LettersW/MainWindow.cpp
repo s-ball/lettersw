@@ -3,6 +3,20 @@
 #include <algorithm>
 
 
+void MainWindow::EnsureVisibleEdit(bool letters, bool focus) {
+    Edit& ctrl = letters ? lettersEdit : searchEdit;
+    if (focus) {
+        SetFocus(GetDlgItem(hWnd, ctrl.getId()));
+    }
+    int y = ctrl.yPos();
+    if (yScroll > y) {
+        yScroll = y;
+        scroller.setCurPos(y);
+        redraw();
+        InvalidateRect(hWnd, NULL, TRUE);
+    }
+}
+
 HWND MainWindow::Create()
 {
     hWnd = CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_MAIN), NULL, (DLGPROC) StaticProc, (LPARAM) this);
@@ -54,6 +68,7 @@ void MainWindow::UpdateLetters(int id = IDC_EDIT_LETTERS, bool letters = true) {
         inUpdateLetters = false;
         SendDlgItemMessage(hWnd, id, EM_SETSEL, start, end);
         if (letters) Valid(FALSE);
+        EnsureVisibleEdit(letters, false);
     }
 }
 
@@ -181,6 +196,12 @@ INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
             return TRUE;
         case ID_EDIT_CLEARALL:
             Clear(ctrlId);
+            return TRUE;
+        case ID_SCROLL_AVAIL:
+            EnsureVisibleEdit(true, true);
+            return TRUE;
+        case ID_SCROLL_MASK:
+            EnsureVisibleEdit(false, true);
             return TRUE;
         }
         switch (HIWORD(wp)) {

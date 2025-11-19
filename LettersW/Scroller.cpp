@@ -57,6 +57,12 @@ bool Scroller::scrollMsg(WPARAM wp)
     return true;
 }
 
+void Scroller::setCurPos(int newPos) {
+    _RPT2(_CRT_WARN, "scroll %d -> %d\n", si.nPos, newPos);
+    si.nPos = newPos;
+    if (si.nMax != 0) SetScrollInfo(parent.getHwnd(), SB_VERT, &si, TRUE);
+}
+
 void Scroller::setScrollbar(bool set) {
     _RPT1(_CRT_WARN, "set scrollbar %d\n", set);
     LONG_PTR style = GetWindowLongPtr(parent.getHwnd(), GWL_STYLE);
@@ -66,9 +72,7 @@ void Scroller::setScrollbar(bool set) {
 }
 
 void Scroller::adjustPos(UINT newPos) {
-    _RPT2(_CRT_WARN, "scroll %d -> %d\n", si.nPos, newPos);
-    si.nPos = newPos;
-    if (si.nMax != 0) SetScrollInfo(parent.getHwnd(), SB_VERT, &si, TRUE);
+    setCurPos(newPos);
     PostMessage(parent.getHwnd(), parent.APPM_SCROLL, newPos, 0);
 }
 

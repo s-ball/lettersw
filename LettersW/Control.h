@@ -33,5 +33,8 @@ public:
 	LONG yPos() {
 		return y;
 	}
+	UINT getId() const {
+		return id;
+	}
 };
 

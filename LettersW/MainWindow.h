@@ -95,6 +95,8 @@ class MainWindow: public ScrollOwner
 		return page;
 	}
 
+	void EnsureVisibleEdit(bool letters, bool focus);
+
 
 public:
 	struct Dims {

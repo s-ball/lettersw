@@ -25,5 +25,6 @@ public:
 	Scroller(ScrollOwner& parent) : parent(parent) {}
 	void setMaxPos(int pos);
 	bool scrollMsg(WPARAM wp);
+	void setCurPos(int pos);
 };
 
