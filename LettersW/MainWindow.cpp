@@ -278,6 +278,29 @@ INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
     case WM_VSCROLL:
         scroller.scrollMsg(wp);
         break;
+    case WM_KEYDOWN:
+        switch (wp) {
+        case VK_UP:
+            scroller.scrollMsg(SB_LINEUP);
+            scroller.scrollMsg(SB_ENDSCROLL);
+            return TRUE;
+        case VK_DOWN:
+            scroller.scrollMsg(SB_LINEDOWN);
+            scroller.scrollMsg(SB_ENDSCROLL);
+            return TRUE;
+        case VK_PRIOR:
+            scroller.scrollMsg(SB_PAGEUP);
+            scroller.scrollMsg(SB_ENDSCROLL);
+            return TRUE;
+        case VK_NEXT:
+            scroller.scrollMsg(SB_PAGEDOWN);
+            scroller.scrollMsg(SB_ENDSCROLL);
+            return TRUE;
+        }
+        break;
+    case WM_MOUSEWHEEL:
+        scroller.scrollWheel(wp);
+        break;
     case APPM_SCROLL:
         yScroll = wp;
         redraw();

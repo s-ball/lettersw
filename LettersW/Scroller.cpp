@@ -57,6 +57,13 @@ bool Scroller::scrollMsg(WPARAM wp)
     return true;
 }
 
+void Scroller::scrollWheel(WPARAM wp) {
+    int pos = si.nPos - static_cast<short>(HIWORD(wp)) * line / WHEEL_DELTA;
+    if (pos < 0) pos = 0;
+    if (pos > si.nMax) pos = si.nMax;
+    adjustPos(pos);
+}
+
 void Scroller::setCurPos(int newPos) {
     _RPT2(_CRT_WARN, "scroll %d -> %d\n", si.nPos, newPos);
     si.nPos = newPos;

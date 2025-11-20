@@ -58,7 +58,15 @@ int WINAPI wWinMain(
         if (TranslateAccelerator(hWnd, hAccel, &msg)) {
             continue;
         }
-        if (IsDialogMessage(hWnd, &msg)) continue;
+        if (IsDialogMessage(hWnd, &msg)) { // Pass arrow keys to the main window for scrolling
+            if (msg.message == WM_KEYDOWN && (msg.wParam == VK_DOWN
+                || msg.wParam == VK_UP || msg.wParam == VK_PRIOR || msg.wParam == VK_NEXT) 
+                ) {
+                msg.hwnd = hWnd;
+                DispatchMessage(&msg);
+            }
+            continue;
+        }
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
