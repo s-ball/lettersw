@@ -31,7 +31,6 @@
 #define IDC_WORDS                       1011
 #define ID_FILE_EXIT                    40001
 #define ID_HELP_ABOUT                   40002
-#define ID_EDIT                         40005
 #define ID_EDIT40008                    40008
 #define ID_EDIT_UNDO                    40009
 #define ID_EDIT_COPY                    40010
