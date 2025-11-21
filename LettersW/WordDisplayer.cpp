@@ -40,6 +40,63 @@ LRESULT WordDisplayer::Proc(UINT msg, WPARAM wp, LPARAM lp)
             EndPaint(hwnd, &ps);
         }
         break;
+    case WM_LBUTTONDOWN: {
+            POINT pt{ LOWORD(lp), HIWORD(lp) };
+
+            if (start.x != -1) {
+                HDC hDC = GetDC(hwnd);
+                drawSelRect(hDC);
+                ReleaseDC(hwnd, hDC);
+            }
+            if (DragDetect(hwnd, pt)) {
+                inDrag = true;
+                end = start = pt;
+                firstSel = lastSel = -1;
+                RECT rect;
+                GetClientRect(hwnd, &rect);
+                pt = POINT{ 0, 0 };
+                ClientToScreen(hwnd, &pt);
+                OffsetRect(&rect, pt.x + 1, pt.y + 1);
+                rect.right -= 2;
+                rect.bottom -= 2;
+                ClipCursor(&rect);
+            }
+            else {
+                inDrag = false;
+                if (start.x != -1) {
+                    start.x = -1;
+                    firstSel = lastSel = -1;
+                    InvalidateRect(hwnd, NULL, TRUE);
+                }
+            }
+        }
+        break;
+    case WM_LBUTTONUP:
+        inDrag = false;
+        ClipCursor(NULL);
+        InvalidateRect(hwnd, NULL, TRUE);
+        if (start.y <= end.y) {
+            first = &start;
+            last = &end;
+        }
+        else {
+            first = &end;
+            last = &start;
+        }
+        break;
+    case WM_MOUSEMOVE:
+        if (inDrag) {
+            HDC hDC = GetDC(hwnd);
+            if (start.x != end.x || start.y != end.y) {
+                drawSelRect(hDC);
+            }
+            end = POINT{ LOWORD(lp), HIWORD(lp) };
+            _RPT4(_CRT_WARN, "Select from %d-%d to %d-%d\n",
+                start.x, start.y, end.x, end.y);
+            drawSelRect(hDC);
+            ReleaseDC(hwnd, hDC);
+        }
+        break;
     default:
         return DefWindowProc(hwnd, msg, wp, lp);
     }
@@ -51,7 +108,7 @@ void WordDisplayer::paint(HDC hDC)
     LPVOID old = SelectObject(hDC, hFont);
 
     int deltaH = addHeight;
-    int y = 0, x = 0;
+    int y = 0, x = 0, index = 0;
     for (const auto& words : wordlist) {
         if (!words.empty()) {
             int len = (int) words[0].size();
@@ -61,7 +118,32 @@ void WordDisplayer::paint(HDC hDC)
             int j = 0;
             x = 0;
             for (const auto& word : words) {
+                if (start.x != -1 && firstSel == -1) {
+                    if (y + deltaH > first->y) {
+                        if (x + deltaW > first->x) {
+                            firstSel = index;
+                        }
+                        else if (y + deltaH > last->y && x + deltaW > last->x) {
+                            std::swap(first, last);
+                            firstSel = index;
+                        }
+                    }
+               }
+                if (firstSel != -1 && lastSel == -1) {
+                    if (y > last->y || (y + deltaH > last->y && x > last->x)) {
+                        lastSel = index;
+                    }
+                }
+                if ((firstSel != -1 && index >= firstSel) && (lastSel == -1 || index < lastSel)) {
+                    SetBkColor(hDC, GetSysColor(COLOR_HIGHLIGHT));
+                    SetTextColor(hDC, GetSysColor(COLOR_HIGHLIGHTTEXT));
+                }
+                else {
+                    SetBkColor(hDC, GetDCBrushColor(hDC));
+                    SetTextColor(hDC, GetSysColor(COLOR_WINDOWTEXT));
+                }
                 TextOut(hDC, x, y, word.data(), (int) word.size());
+                index += 1;
                 if (++j == count) {
                     j = 0;
                     x = 0;
@@ -73,6 +155,10 @@ void WordDisplayer::paint(HDC hDC)
         if (x == 0) y += deltaH / 2;
         else y += deltaH * 3 / 2;
     }
+    if (firstSel != -1 && lastSel == -1) lastSel = index;
+    /*if (start.x != -1) {
+        drawSelRect(hDC);
+    }*/
     _RPT1(_CRT_WARN, "required height: %d\n", y + singleHeight);
     SelectObject(hDC, old);
 }

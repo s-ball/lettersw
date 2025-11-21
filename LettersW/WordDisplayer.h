@@ -10,6 +10,7 @@ class WordDisplayer: public Control
 
 	std::vector<std::vector<std::vector<WCHAR>>> wordlist;
 
+
 	HFONT hFont;
 	bool hFontDel = false;
 
@@ -28,6 +29,10 @@ class WordDisplayer: public Control
 	LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
 	void paint(HDC hDC);
 
+	bool inDrag = false;
+	POINT start{ -1 }, end;
+	POINT* first, * last;
+	int firstSel = -1, lastSel = -1;
 
 public:
 	WordDisplayer(UINT id, unsigned char sizing, unsigned char moving);
@@ -47,6 +52,14 @@ public:
 	}
 	int line() const {
 		return addHeight;
+	}
+	void drawSelRect(HDC hDC) {
+		SetROP2(hDC, R2_NOT);
+		MoveToEx(hDC, start.x, start.y, NULL);
+		LineTo(hDC, end.x, start.y);
+		LineTo(hDC, end.x, end.y);
+		LineTo(hDC, start.x, end.y);
+		LineTo(hDC, start.x, start.y);
 	}
 };
 
