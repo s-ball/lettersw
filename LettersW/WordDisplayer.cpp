@@ -183,7 +183,45 @@ void WordDisplayer::paint(HDC hDC)
 BOOL WordDisplayer::doCopy()
 {
     _RPT0(_CRT_WARN, "Should copy to clipboard\n");
-    return 0;
+    if (firstSel == -1) return FALSE;
+    std::vector<WCHAR> temp;
+    // Search for first selected element
+    auto curList = this->wordlist.begin();
+    int first = firstSel;
+    for (;;) {
+        if (curList == wordlist.end()) { // could not find it ?!
+            return FALSE;
+        }
+        if (curList->size() > first) break;
+        first -= curList->size();
+        ++curList;
+    }
+    // Copy selected words
+    int count = lastSel - firstSel;
+    auto curWord = curList->begin() + first;
+    for (;;) {
+        for (auto c : *curWord) temp.push_back(c);
+        if (--count == 0) break;
+        temp.push_back(' ');
+        if (++curWord == curList->end()) {
+            if (++curList == wordlist.end()) return FALSE;
+            curWord = curList->begin();
+        }
+    }
+    temp.push_back(0);
+    HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * temp.size());
+    if (hMem) {
+        LPWSTR ix = (LPWSTR)GlobalLock(hMem);
+        lstrcpyW(ix, temp.data());
+        GlobalUnlock(hMem);
+
+        OpenClipboard(hwnd);
+        EmptyClipboard();
+        SetClipboardData(CF_UNICODETEXT, hMem);
+        CloseClipboard();
+        return TRUE;
+    }
+    return FALSE;
 }
 
 
