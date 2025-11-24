@@ -28,11 +28,14 @@ class WordDisplayer: public Control
 
 	LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
 	void paint(HDC hDC);
+	BOOL doCopy();
 
 	bool inDrag = false;
 	POINT start{ -1 }, end;
 	POINT* first, * last;
 	int firstSel = -1, lastSel = -1;
+
+	HWND parent;
 
 public:
 	WordDisplayer(UINT id, unsigned char sizing, unsigned char moving);
@@ -60,6 +63,9 @@ public:
 		LineTo(hDC, end.x, end.y);
 		LineTo(hDC, start.x, end.y);
 		LineTo(hDC, start.x, start.y);
+	}
+	bool hasSel() const {
+		return (firstSel != -1 && firstSel != lastSel);
 	}
 };
 

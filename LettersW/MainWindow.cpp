@@ -242,6 +242,7 @@ INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
             }
         case BN_SETFOCUS:
             ctrlId = LOWORD(wp);
+            _RPT1(_CRT_WARN, "Focus to child %x\n", ctrlId);
             break;
         case EN_KILLFOCUS:
             switch (LOWORD(wp)) {
@@ -272,7 +273,12 @@ INT_PTR MainWindow::Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         break;
     case WM_INITMENUPOPUP:
         if (1 == LOWORD(lp)) { // Edit menu
-            initEditMenu((ctrlId == IDC_EDIT_LETTERS) || (ctrlId == IDC_EDIT_SEARCH));
+            if (ctrlId == IDC_WORDS) {
+                initEditMenu(false);
+                EnableMenuItem(GetMenu(hWnd), ID_EDIT_COPY, 
+                    wd.hasSel() ? MF_ENABLED : MF_GRAYED);
+            }
+            else initEditMenu((ctrlId == IDC_EDIT_LETTERS) || (ctrlId == IDC_EDIT_SEARCH));
         }
         break;
     case WM_VSCROLL:
@@ -408,9 +414,9 @@ void MainWindow::initEditMenu(bool inEdit) {
 }
 
 bool MainWindow::editCopy() {
-    DWORD start, end;
+    //DWORD start, end;
     HWND child = GetDlgItem(hWnd, ctrlId);
-    DWORD sel = (DWORD)SendMessageW(child, EM_GETSEL, (WPARAM) & start, (WPARAM) & end);
+    /* DWORD sel = (DWORD)SendMessageW(child, EM_GETSEL, (WPARAM)&start, (WPARAM)&end);
     if (start == end) return false;
     if (start > end) std::swap(start, end);
     std::vector<WCHAR> temp(1 + end);
@@ -428,7 +434,9 @@ bool MainWindow::editCopy() {
         CloseClipboard();
         return true;
     }
-    return false;
+    return false; */
+    SendMessage(child, WM_COPY, 0, 0);
+    return true;
 }
 
 void MainWindow::editCut() {

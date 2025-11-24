@@ -4,7 +4,7 @@
 ATOM WordDisplayer::registerClass()
 {
     WNDCLASS wndClass = {
-        CS_HREDRAW | CS_VREDRAW,
+        CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS,
         staticProc,
         0,
         sizeof(WordDisplayer*),
@@ -40,9 +40,15 @@ LRESULT WordDisplayer::Proc(UINT msg, WPARAM wp, LPARAM lp)
             EndPaint(hwnd, &ps);
         }
         break;
+    case WM_SETFOCUS:
+        SendMessage(parent, WM_COMMAND, (EN_SETFOCUS << 16) | id, (LPARAM) hwnd);
+        break;
+    case WM_COPY:
+        return doCopy();
     case WM_LBUTTONDOWN: {
             POINT pt{ LOWORD(lp), HIWORD(lp) };
 
+            SetFocus(hwnd);
             if (start.x != -1) {
                 HDC hDC = GetDC(hwnd);
                 drawSelRect(hDC);
@@ -97,6 +103,17 @@ LRESULT WordDisplayer::Proc(UINT msg, WPARAM wp, LPARAM lp)
             ReleaseDC(hwnd, hDC);
         }
         break;
+    case WM_LBUTTONDBLCLK:
+        start = end = POINT{ LOWORD(lp), HIWORD(lp) };
+        first = &start;
+        last = &end;
+        firstSel = lastSel = -1;
+        break;
+    case WM_GETDLGCODE:
+        _RPT2(_CRT_WARN, "GETDLGCODE %x - %x\n", wp, lp);
+        return DLGC_WANTCHARS;
+    case WM_CHAR:
+        if (wp == 0x03) return doCopy();
     default:
         return DefWindowProc(hwnd, msg, wp, lp);
     }
@@ -163,6 +180,12 @@ void WordDisplayer::paint(HDC hDC)
     SelectObject(hDC, old);
 }
 
+BOOL WordDisplayer::doCopy()
+{
+    _RPT0(_CRT_WARN, "Should copy to clipboard\n");
+    return 0;
+}
+
 
 WordDisplayer::WordDisplayer(UINT id, unsigned char sizing, unsigned char moving)
     : Control(id, sizing, moving)
@@ -177,6 +200,7 @@ WordDisplayer::WordDisplayer(UINT id, unsigned char sizing, unsigned char moving
 }
 
 void WordDisplayer::onInit(HWND parent, LPRECT parentRect) {
+    this->parent = parent;
     Control::onInit(parent, parentRect);
     hNoScroll = height;
     hwnd = GetDlgItem(parent, id);
